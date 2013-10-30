@@ -111,10 +111,13 @@ class LdapBackendAdapter {
 		$this->connect();
 		$filter = $this->connection->ldapUuidAttribute . '=' . $uuid;
 		$users = $this->ldap->fetchListOfUsers($filter, 'dn');
-		if (count($users) === 1 && $users[0]['count'] === 1) {
-			$dn = $users[0][0];
-			$this->ldap->dn2ocname($dn);//creates table entries and folders
-			return true;
+		if (count($users) === 1) {
+			if ($users[0]['count'] === 1) {
+				$dn = $users[0][0];
+			} else {
+				$dn = $users[0];
+			}
+			return $this->ldap->dn2ocname($dn);//creates table entries and folders
 		}
 		return false;
 	}

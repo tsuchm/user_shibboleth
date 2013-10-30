@@ -58,7 +58,7 @@ if ($enabled && $sessionsHandlerUrl !== '' && $sessionInitiatorLocation !== '') 
 		$adapter = new \OCA\user_shibboleth\LdapBackendAdapter();
 		$loginName = $adapter->getUuid($mail);
 		if ($loginName) {//user is internal, backends are enabled, and user mapping is active
-			$adapter->initializeUser($loginName);
+			$loginName = $adapter->initializeUser($loginName);
 		} else {//user is external
 			//crop $mail to fit into display_name column of oc_shibboleth_user
 			if (strlen($mail) > 64) {
@@ -80,7 +80,10 @@ if ($enabled && $sessionsHandlerUrl !== '' && $sessionInitiatorLocation !== '') 
 			}
 		}
 		//perform OC login
-		\OC_User::login($loginName, 'irrelevant');
+		if(\OC_User::login($loginName, 'irrelevant')){
+			\OC_Util::redirectToDefaultPage();
+			exit();
+		}
 	} else {//not authenticated, yet
 		//follow shibboleth authentication procedure
 		$location = $sessionsHandlerUrl . $sessionInitiatorLocation . '?target=' . \OCA\user_shibboleth\LoginLib::getForwardingPageUrl();
